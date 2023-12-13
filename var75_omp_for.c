@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <omp.h>
 
-#define  Max(a,b) ((a)>(b)?(a):(b))
+#define  Max(a, b) ((a)>(b)?(a):(b))
 
-#define  N   ((1 << 7) + 2)
+#define  N   ((1 << 6) + 2)
 float maxeps = 0.1e-7;
 int itmax = 100;
 int i, j, k;
@@ -13,23 +14,29 @@ int i, j, k;
 float eps;
 float A[N][N][N];
 
-void relax();
-void init();
-void verify();
-void test();
-int run_task(int an, char **as);
+void
+relax();
 
-int main(int an, char** as)
+void
+init();
+
+void
+verify();
+
+void
+test();
+
+int
+run_task(int an, char** as);
+
+int
+main(int an, char** as)
 {
-	clock_t time = clock();
 	run_task(an, as);
-	time = clock() - time;
-	const double time_taken = (double) time / CLOCKS_PER_SEC;
-
-	printf("task took %f seconds to execute \n", time_taken);
 }
 
-int run_task(int an, char **as)
+int
+run_task(int an, char** as)
 {
 	int it;
 
@@ -48,7 +55,8 @@ int run_task(int an, char **as)
 	return 0;
 }
 
-void init()
+void
+init()
 {
 	for (i = 0; i <= N - 1; i++)
 		for (j = 0; j <= N - 1; j++)
@@ -60,41 +68,40 @@ void init()
 			}
 }
 
-void relax()
+void
+relax()
 {
-#pragma omp parallel
-	{
-		for (i = 2; i <= N - 3; i++)
-#pragma  omp for
-			for (j = 1; j <= N - 2; j++)
-				for (k = 1; k <= N - 2; k++)
-				{
-					A[i][j][k] = (A[i - 1][j][k] + A[i + 1][j][k] + A[i - 2][j][k] + A[i + 2][j][k]) / 4.;
-				}
+#pragma omp parallel for shared(A) private(i, j, k)
+	for (i = 2; i <= N - 3; i++)
+		for (j = 1; j <= N - 2; j++)
+			for (k = 1; k <= N - 2; k++)
+			{
+				A[i][j][k] = (A[i - 1][j][k] + A[i + 1][j][k] + A[i - 2][j][k] + A[i + 2][j][k]) / 4.;
+			}
 
-		for (i = 1; i <= N - 2; i++)
-#pragma  omp for
-			for (j = 2; j <= N - 3; j++)
-				for (k = 1; k <= N - 2; k++)
-				{
-					A[i][j][k] = (A[i][j - 1][k] + A[i][j + 1][k] + A[i][j - 2][k] + A[i][j + 2][k]) / 4.;
-				}
+#pragma omp parallel for shared(A) private(i, j, k)
+	for (i = 1; i <= N - 2; i++)
+		for (j = 2; j <= N - 3; j++)
+			for (k = 1; k <= N - 2; k++)
+			{
+				A[i][j][k] = (A[i][j - 1][k] + A[i][j + 1][k] + A[i][j - 2][k] + A[i][j + 2][k]) / 4.;
+			}
 
-		for (i = 1; i <= N - 2; i++)
-#pragma  omp for
-			for (j = 1; j <= N - 2; j++)
-				for (k = 2; k <= N - 3; k++)
-				{
-					float e;
-					e = A[i][j][k];
-					A[i][j][k] = (A[i][j][k - 1] + A[i][j][k + 1] + A[i][j][k - 2] + A[i][j][k + 2]) / 4.;
-					eps = Max(eps, fabs(e-A[i][j][k]));
-				}
-	}
+#pragma omp parallel for shared(A) private(i, j, k) reduction(max:eps)
+	for (i = 1; i <= N - 2; i++)
+		for (j = 1; j <= N - 2; j++)
+			for (k = 2; k <= N - 3; k++)
+			{
+				float e;
+				e = A[i][j][k];
+				A[i][j][k] = (A[i][j][k - 1] + A[i][j][k + 1] + A[i][j][k - 2] + A[i][j][k + 2]) / 4.;
+				eps = Max(eps, fabs(e - A[i][j][k]));
+			}
 
 }
 
-void verify()
+void
+verify()
 {
 	float s;
 
@@ -105,5 +112,15 @@ void verify()
 			{
 				s = s + A[i][j][k] * (i + 1) * (j + 1) * (k + 1) / (N * N * N);
 			}
+
 	printf("  S = %f\n", s);
+}
+
+void
+test()
+{
+#pragma omp parallel
+	{
+		printf("%d", omp_get_thread_num());
+	}
 }
