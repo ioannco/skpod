@@ -13,4 +13,5 @@ endif()
 
 add_executable(omp_task task.c)
 add_executable(vanilla optimized.c)
-add_executable(omp_for for.c)
+add_executable(omp_for for.c
+        config.h)
