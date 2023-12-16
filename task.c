@@ -13,7 +13,7 @@
 const float NNN3 = 1.f / (N * N * N);
 
 float maxeps = 0.1e-7;
-int itmax = 1;
+int itmax = 100;
 int i, j, k, task_offset;
 
 float eps;
