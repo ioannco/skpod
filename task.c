@@ -7,7 +7,8 @@
 #include "config.h"
 
 #define  Max(a, b) ((a)>(b)?(a):(b))
-#define  Min(a, b) ((a)<(b)?(a):(b))
+
+#define TASKS_COUNT  NUM_THREADS * 4
 
 const float NNN3 = 1.f / (N * N * N);
 
@@ -75,9 +76,11 @@ void init() {
 }
 
 void relax() {
-	const int task_batch_size = N / NUM_THREADS + 1;
+	const int task_batch_size = N / TASKS_COUNT + 1;
 #pragma omp task shared(A) firstprivate(i, j, k, task_offset)
 	for (task_offset = 1; task_offset < N - 1; task_offset += task_batch_size){int task_end = task_offset + task_batch_size;
+
+		printf("%d\n", omp_get_thread_num());
 		if (task_end > N - 1)
 			task_end = N - 1;
 

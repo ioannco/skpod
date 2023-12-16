@@ -20,7 +20,7 @@ if __name__ == '__main__':
     os.mkdir(build_dir)
 
     num_threads = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 40, 60, 80, 100, 120, 140, 160]
-    dataset_sizes = ['MINI_DATASET', 'SMALL_DATASET', 'MEDIUM_DATASET', 'LARGE_DATASET', 'EXTRALARGE_DATASET']
+    dataset_sizes = ['MINI_DATASET', 'SMALL_DATASET', 'MEDIUM_DATASET', 'LARGE_DATASET']
     optimizations = [None, 'O2', 'O3', 'Ofast']
 
     source = workspace_folder/'task.c'
