@@ -110,21 +110,21 @@ void init() {
 
 void relax() {
     for (i = 2; i <= N - 3; i++)
-#pragma omp parallel for shared(A) private(k, j) num_threads(NUM_THREADS)
+#pragma omp parallel for shared(A) private(k, j) num_threads(NUM_THREADS) collapse(2)
             for (j = 1; j <= N - 2; j++)
                 for (k = 1; k <= N - 2; k++) {
                     A[i][j][k] = (A[i - 1][j][k] + A[i + 1][j][k] + A[i - 2][j][k] + A[i + 2][j][k]) * 0.25;
                 }
 
     for (j = 2; j <= N - 3; j++)
-#pragma omp parallel for shared(A) private(i, k) num_threads(NUM_THREADS)
+#pragma omp parallel for shared(A) private(i, k) num_threads(NUM_THREADS) collapse(2)
             for (i = 1; i <= N - 2; i++)
                 for (k = 1; k <= N - 2; k++) {
                     A[i][j][k] = (A[i][j - 1][k] + A[i][j + 1][k] + A[i][j - 2][k] + A[i][j + 2][k]) * 0.25;
                 }
 
     for (k = 2; k <= N - 3; k++)
-#pragma omp parallel for shared(A) private(i, j) reduction(max:eps) num_threads(NUM_THREADS)
+#pragma omp parallel for shared(A) private(i, j) reduction(max:eps) num_threads(NUM_THREADS) collapse(2)
             for (i = 1; i <= N - 2; i++)
                 for (j = 1; j <= N - 2; j++) {
                     float e;
