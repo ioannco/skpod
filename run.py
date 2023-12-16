@@ -20,7 +20,7 @@ if __name__ == '__main__':
     os.mkdir(build_dir)
 
     num_threads = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 40, 60, 80, 100, 120, 140, 160]
-    dataset_sizes = ['MINI_DATASET', 'SMALL_DATASET', 'MEDIUM_DATASET', 'LARGE_DATASET', 'EXTRA_LARGE_DATASET']
+    dataset_sizes = ['MINI_DATASET', 'SMALL_DATASET', 'MEDIUM_DATASET', 'LARGE_DATASET', 'EXTRALARGE_DATASET']
     optimizations = [None, 'O2', 'O3', 'Ofast']
 
     source = workspace_folder/'for.c'
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         for dataset in dataset_sizes:
             os.system(f"echo -n '{dataset},' >> {output_file}")
             for threads in num_threads:
-                print(f'O: {optimization or "None":<8} | Dataset: {dataset:<25} | Threads: {threads:<15}')
+                print(f'O: {optimization or "None":^8} | Dataset: {dataset:^25} | Threads: {threads:^15} ')
                 compile_and_run(source, output_file, ['fopenmp', optimization, f'DNUM_THREADS={threads}', f'D{dataset}'])
                 os.system(f"echo -n  ',' >> {output_file}")
             os.system(f"echo '' >> {output_file}")

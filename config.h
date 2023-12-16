@@ -30,7 +30,7 @@
 #endif
 #endif
 
-#ifdef EXTRA_LARGE_DATASET
+#ifdef EXTRALARGE_DATASET
 #define  N  (2*2*2*2*2*2*2*2 + 2)
 #ifndef CHECKSUM
 #define CHECKSUM 953108160.000000
