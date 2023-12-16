@@ -24,12 +24,12 @@ if __name__ == '__main__':
 
     num_threads = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 40, 60, 80, 100, 120, 140, 160]
     dataset_sizes = ['MINI_DATASET', 'SMALL_DATASET', 'MEDIUM_DATASET', 'LARGE_DATASET']
-    optimizations = [None, 'O2', 'O3', 'fast']
+    optimizations = [None, 'O2', 'O3', 'Ofast']
 
     source = workspace_folder/'for.c'
 
     for optimization in optimizations:
-        output_file = build_dir/f'output_{optimization}.csv'
+        output_file = build_dir/f'for_data_{optimization}.csv'
         for dataset in dataset_sizes:
             os.system(f"echo -n '{dataset},' >> {output_file}")
             for threads in num_threads:
