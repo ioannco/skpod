@@ -8,12 +8,12 @@
 
 #define  Max(a, b) ((a)>(b)?(a):(b))
 
-#define TASKS_COUNT  (NUM_THREADS * 4)
+#define TASKS_COUNT  (NUM_THREADS)
 
 const float NNN3 = 1.f / (N * N * N);
 
 float maxeps = 0.1e-7;
-int itmax = 100;
+int itmax = 1;
 int i, j, k, task_offset;
 
 float eps;
@@ -59,7 +59,7 @@ void run() {
 
 #pragma omp taskwait
 
-        printf("%f", timer);
+        printf("%f\n", timer);
         verify();
         }
     }
@@ -77,12 +77,12 @@ void init() {
 
 void relax() {
 	const int task_batch_size = N / TASKS_COUNT + 1;
-#pragma omp task shared(A) firstprivate(i, j, k, task_offset)
 	for (task_offset = 1; task_offset < N - 1; task_offset += task_batch_size){
 		int task_end = task_offset + task_batch_size;
 		if (task_end > N - 1)
 			task_end = N - 1;
 
+#pragma omp task shared(A) firstprivate(i, j, k, task_offset)
 		for (k = task_offset; k < task_end; k++) {
 			for (i = 2; i <= N - 3; i++) {
 				for (j = 1; j <= N - 2; j++) {
@@ -93,12 +93,12 @@ void relax() {
 	}
 #pragma omp taskwait
 
-#pragma omp task shared(A) firstprivate(i, j, k, task_offset)
 	for (task_offset = 1; task_offset < N - 1; task_offset += task_batch_size){
 		int task_end = task_offset + task_batch_size;
 		if (task_end > N - 1)
 			task_end = N - 1;
 
+#pragma omp task shared(A) firstprivate(i, j, k, task_offset)
 		for (k = task_offset; k < task_end; k++) {
 			for (i = 1; i <= N - 2; i++) {
 				for (j = 2; j <= N - 3; j++) {
@@ -109,12 +109,12 @@ void relax() {
 	}
 #pragma omp taskwait
 
-#pragma omp task shared(A) firstprivate(i, j, k, task_offset)
 	for (task_offset = 1; task_offset <= N - 1; task_offset += task_batch_size) {
 		int task_end = task_offset + task_batch_size;
 		if (task_end > N - 1)
 			task_end = N - 1;
 
+#pragma omp task shared(A) firstprivate(i, j, k, task_offset)
 		for (i = task_offset; i < task_end; i++) {
 			for (j = 1; j <= N - 2; j++) {
 				for (k = 2; k <= N - 3; k++) {
