@@ -8,7 +8,7 @@
 
 #define  Max(a, b) ((a)>(b)?(a):(b))
 
-#define TASKS_COUNT  NUM_THREADS * 4
+#define TASKS_COUNT  (NUM_THREADS * 4)
 
 const float NNN3 = 1.f / (N * N * N);
 
@@ -24,14 +24,13 @@ void relax();
 void init();
 void verify();
 void run();
-double measure_time(void (*func)());
 double getclock();
 
 double getclock()
 {
     struct timeval Tp;
     gettimeofday (&Tp, NULL);
-    return Tp.tv_sec + Tp.tv_usec * 1.0e-6;
+    return (double) Tp.tv_sec + Tp.tv_usec * 1.0e-6;
 }
 
 int main(int an, char **as) {
@@ -46,18 +45,19 @@ void run() {
     {
 #pragma omp master
         {
-            double tstart = getclock();
-            double timer = 0.;
-
+            double timer = 0.f;
+			double tstart;
+			double tend;
             for (it = 1; it <= itmax; it++) {
-                eps = 0.;
+                eps = 0.f;
+				tstart = getclock();
                 relax();
+				tend = getclock();
+				timer += tend - tstart;
                 if (eps < maxeps) break;
             }
 
 #pragma omp taskwait
-        double tend = getclock();
-        timer = tend - tstart;
 
         printf("%f", timer);
         verify();
@@ -70,24 +70,23 @@ void init() {
         for (j = 0; j <= N - 1; j++)
             for (k = 0; k <= N - 1; k++) {
                 if (i == 0 || i == N - 1 || j == 0 || j == N - 1 || k == 0 || k == N - 1)
-                    A[i][j][k] = 0.;
-                else A[i][j][k] = (4. + i + j + k);
+                    A[i][j][k] = 0.f;
+                else A[i][j][k] = (4.f + (float)(i + j + k));
             }
 }
 
 void relax() {
 	const int task_batch_size = N / TASKS_COUNT + 1;
 #pragma omp task shared(A) firstprivate(i, j, k, task_offset)
-	for (task_offset = 1; task_offset < N - 1; task_offset += task_batch_size){int task_end = task_offset + task_batch_size;
-
-		printf("%d\n", omp_get_thread_num());
+	for (task_offset = 1; task_offset < N - 1; task_offset += task_batch_size){
+		int task_end = task_offset + task_batch_size;
 		if (task_end > N - 1)
 			task_end = N - 1;
 
 		for (k = task_offset; k < task_end; k++) {
 			for (i = 2; i <= N - 3; i++) {
 				for (j = 1; j <= N - 2; j++) {
-					A[i][j][k] = (A[i - 1][j][k] + A[i + 1][j][k] + A[i - 2][j][k] + A[i + 2][j][k]) * 0.25;
+					A[i][j][k] = (A[i - 1][j][k] + A[i + 1][j][k] + A[i - 2][j][k] + A[i + 2][j][k]) * 0.25f;
 				}
 			}
 		}
@@ -103,7 +102,7 @@ void relax() {
 		for (k = task_offset; k < task_end; k++) {
 			for (i = 1; i <= N - 2; i++) {
 				for (j = 2; j <= N - 3; j++) {
-					A[i][j][k] = (A[i][j - 1][k] + A[i][j + 1][k] + A[i][j - 2][k] + A[i][j + 2][k]) * 0.25;
+					A[i][j][k] = (A[i][j - 1][k] + A[i][j + 1][k] + A[i][j - 2][k] + A[i][j + 2][k]) * 0.25f;
 				}
 			}
 		}
@@ -121,8 +120,8 @@ void relax() {
 				for (k = 2; k <= N - 3; k++) {
 					float e;
 					e = A[i][j][k];
-					A[i][j][k] = (A[i][j][k - 1] + A[i][j][k + 1] + A[i][j][k - 2] + A[i][j][k + 2]) * 0.25;
-					eps = Max(eps, fabs(e - A[i][j][k]));
+					A[i][j][k] = (A[i][j][k - 1] + A[i][j][k + 1] + A[i][j][k - 2] + A[i][j][k + 2]) * 0.25f;
+					eps = Max(eps, fabsf(e - A[i][j][k]));
 				}
 			}
 		}
@@ -138,7 +137,7 @@ void verify() {
     for (i = 0; i <= N - 1; i++)
         for (j = 0; j <= N - 1; j++)
             for (k = 0; k <= N - 1; k++) {
-                s = s + A[i][j][k] * (i + 1) * (j + 1) * (k + 1) * NNN3;
+                s = s + A[i][j][k] * (float)(i + 1) * (float)(j + 1) * (float)(k + 1) * NNN3;
             }
 
 #ifndef CHECKSUM
