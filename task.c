@@ -58,7 +58,7 @@ void run() {
         double tend = getclock();
         timer = tend - tstart;
 
-        printf("Overall time: %f\n", timer);
+        printf("%f", timer);
         verify();
         }
     }
@@ -76,16 +76,10 @@ void init() {
 
 void relax() {
 	const int task_batch_size = N / NUM_THREADS + 1;
-	printf("N = %d, task_batch_size = %d, task_batch_size * NUM_THREADS = %d\n", N, task_batch_size, task_batch_size * NUM_THREADS);
-
-
 #pragma omp task shared(A) firstprivate(i, j, k, task_offset)
 	for (task_offset = 1; task_offset < N - 1; task_offset += task_batch_size){int task_end = task_offset + task_batch_size;
-
 		if (task_end > N - 1)
 			task_end = N - 1;
-
-		printf("task_offset = %d, task_end = %d, vanilla_start = %d, vanilla_end = %d\n", task_offset, task_end, 1, N-1);
 
 		for (k = task_offset; k < task_end; k++) {
 			for (i = 2; i <= N - 3; i++) {
