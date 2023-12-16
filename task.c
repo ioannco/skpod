@@ -28,7 +28,7 @@ double getclock();
 double getclock()
 {
     struct timeval Tp;
-    int stat = gettimeofday (&Tp, NULL);
+    gettimeofday (&Tp, NULL);
     return Tp.tv_sec + Tp.tv_usec * 1.0e-6;
 }
 
@@ -113,5 +113,11 @@ void verify() {
                 s = s + A[i][j][k] * (i + 1) * (j + 1) * (k + 1) * NNN3;
             }
 
-    printf("  S = %f\n", s);
+#ifndef CHECKSUM
+	printf("checksum == %f\n", s);
+#else
+	if (s != CHECKSUM) {
+		fprintf(stderr, "Warning: checksum failed! %f != %f\n", s, CHECKSUM);
+	}
+#endif
 }

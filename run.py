@@ -23,10 +23,10 @@ if __name__ == '__main__':
     dataset_sizes = ['MINI_DATASET', 'SMALL_DATASET', 'MEDIUM_DATASET', 'LARGE_DATASET', 'EXTRALARGE_DATASET']
     optimizations = [None, 'O2', 'O3', 'Ofast']
 
-    source = workspace_folder/'for.c'
+    source = workspace_folder/'task.c'
 
     for optimization in optimizations:
-        output_file = build_dir/f'for_data_{optimization}.csv'
+        output_file = build_dir/f'task_data_{optimization}.csv'
         for dataset in dataset_sizes:
             os.system(f"echo -n '{dataset},' >> {output_file}")
             for threads in num_threads:
