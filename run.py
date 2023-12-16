@@ -28,9 +28,9 @@ if __name__ == '__main__':
     for optimization in optimizations:
         output_file = build_dir/f'for_data_{optimization}.csv'
         for dataset in dataset_sizes:
-            os.system(f"echo -n '{dataset},' >> {output_file}")
+            os.system(f"echo -n '{dataset},' >> {output_file}") 
             for threads in num_threads:
-                print(f'Optimization: {optimization or "No opitmization":<15} Dataset: {dataset:<15} Threads: {threads:<15}')
+                print(f'O:  {optimization or "None":<15}  Dataset:  {dataset:<15} Threads:  {threads:<15}')
                 compile_and_run(source, output_file, ['fopenmp', optimization, f'DNUM_THREADS={threads}', f'D{dataset}'])
                 os.system(f"echo -n  ',' >> {output_file}")
             os.system(f"echo '' >> {output_file}")
