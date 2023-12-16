@@ -58,18 +58,25 @@ int main(int an, char **as) {
 }
 
 void run() {
-    int it;
+	int it;
 
-    init();
+	init();
 
-    for (it = 1; it <= itmax; it++) {
-        eps = 0.;
-        relax();
-        printf("it=%4i   eps=%f\n", it, eps);
-        if (eps < maxeps) break;
-    }
+	double timer = 0.;
+	int cnt = 0;
 
-    verify();
+	for (it = 1; it <= itmax; it++) {
+		++cnt;
+		eps = 0.;
+		double bench_t_start = getclock();
+		relax();
+		double bench_t_end = getclock();
+		timer += bench_t_end - bench_t_start;
+		if (eps < maxeps) break;
+	}
+	printf("%f\n", timer);
+
+	verify();
 }
 
 void init() {
