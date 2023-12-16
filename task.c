@@ -7,12 +7,13 @@
 #include "config.h"
 
 #define  Max(a, b) ((a)>(b)?(a):(b))
+#define  Min(a, b) ((a)<(b)?(a):(b))
 
 const float NNN3 = 1.f / (N * N * N);
 
 float maxeps = 0.1e-7;
 int itmax = 100;
-int i, j, k;
+int i, j, k, task_offset;
 
 float eps;
 float A[N][N][N];
@@ -74,31 +75,61 @@ void init() {
 }
 
 void relax() {
-        for (k = 1; k <= N - 2; k++)
-#pragma omp task shared(A) firstprivate(i, j, k)
-            for (i = 2; i <= N - 3; i++)
-                for (j = 1; j <= N - 2; j++) {
-                    A[i][j][k] = (A[i - 1][j][k] + A[i + 1][j][k] + A[i - 2][j][k] + A[i + 2][j][k]) * 0.25;
-                }
+	const int task_batch_size = N / NUM_THREADS + 1;
+	printf("N = %d, task_batch_size = %d, task_batch_size * NUM_THREADS = %d\n", N, task_batch_size, task_batch_size * NUM_THREADS);
+
+
+#pragma omp task shared(A) firstprivate(i, j, k, task_offset)
+	for (task_offset = 1; task_offset < N - 1; task_offset += task_batch_size){int task_end = task_offset + task_batch_size;
+
+		if (task_end > N - 1)
+			task_end = N - 1;
+
+		printf("task_offset = %d, task_end = %d, vanilla_start = %d, vanilla_end = %d\n", task_offset, task_end, 1, N-1);
+
+		for (k = task_offset; k < task_end; k++) {
+			for (i = 2; i <= N - 3; i++) {
+				for (j = 1; j <= N - 2; j++) {
+					A[i][j][k] = (A[i - 1][j][k] + A[i + 1][j][k] + A[i - 2][j][k] + A[i + 2][j][k]) * 0.25;
+				}
+			}
+		}
+	}
 #pragma omp taskwait
 
-        for (k = 1; k <= N - 2; k++)
-#pragma omp task shared(A) firstprivate(i, j, k)
-            for (i = 1; i <= N - 2; i++)
-                for (j = 2; j <= N - 3; j++) {
-                    A[i][j][k] = (A[i][j - 1][k] + A[i][j + 1][k] + A[i][j - 2][k] + A[i][j + 2][k]) * 0.25;
-                }
+#pragma omp task shared(A) firstprivate(i, j, k, task_offset)
+	for (task_offset = 1; task_offset < N - 1; task_offset += task_batch_size){
+		int task_end = task_offset + task_batch_size;
+		if (task_end > N - 1)
+			task_end = N - 1;
+
+		for (k = task_offset; k < task_end; k++) {
+			for (i = 1; i <= N - 2; i++) {
+				for (j = 2; j <= N - 3; j++) {
+					A[i][j][k] = (A[i][j - 1][k] + A[i][j + 1][k] + A[i][j - 2][k] + A[i][j + 2][k]) * 0.25;
+				}
+			}
+		}
+	}
 #pragma omp taskwait
 
-        for (i = 1; i <= N - 2; i++)
-#pragma omp task shared(A) firstprivate(i, j, k)
-			for (j = 1; j <= N - 2; j++)
-				for (k = 2; k <= N - 3; k++){
-                    float e;
-                    e = A[i][j][k];
-                    A[i][j][k] = (A[i][j][k - 1] + A[i][j][k + 1] + A[i][j][k - 2] + A[i][j][k + 2]) * 0.25;
-                    eps = Max(eps, fabs(e - A[i][j][k]));
-                }
+#pragma omp task shared(A) firstprivate(i, j, k, task_offset)
+	for (task_offset = 1; task_offset <= N - 1; task_offset += task_batch_size) {
+		int task_end = task_offset + task_batch_size;
+		if (task_end > N - 1)
+			task_end = N - 1;
+
+		for (i = task_offset; i < task_end; i++) {
+			for (j = 1; j <= N - 2; j++) {
+				for (k = 2; k <= N - 3; k++) {
+					float e;
+					e = A[i][j][k];
+					A[i][j][k] = (A[i][j][k - 1] + A[i][j][k + 1] + A[i][j][k - 2] + A[i][j][k + 2]) * 0.25;
+					eps = Max(eps, fabs(e - A[i][j][k]));
+				}
+			}
+		}
+	}
 #pragma omp taskwait
 
 }
@@ -116,7 +147,7 @@ void verify() {
 #ifndef CHECKSUM
 	printf("checksum == %f\n", s);
 #else
-	if (s != CHECKSUM) {
+	if (s != (float)CHECKSUM) {
 		fprintf(stderr, "Warning: checksum failed! %f != %f\n", s, CHECKSUM);
 	}
 #endif
