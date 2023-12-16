@@ -93,7 +93,7 @@ void run() {
         timer += bench_t_end - bench_t_start;
         if (eps < maxeps) break;
     }
-    printf("%f\n", timer);
+    printf("%f", timer);
 
     verify();
 }
@@ -149,6 +149,6 @@ void verify() {
 #ifndef CHECKSUM
     printf("checksum == %f\n", s);
 #else
-    // assert (s == CHECKSUM);
+    assert (s == CHECKSUM);
 #endif
 }

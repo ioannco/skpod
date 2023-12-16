@@ -7,20 +7,35 @@ build_dir = workspace_folder/'build'
 
 
 def compile_and_run(source: Path, output: Path, compile_flags: list):
-    flag_string = ' '.join(f'-{f}' for f in compile_flags)
+    flag_string = ' '.join(f'-{f}' for f in compile_flags if f is not None)
 
-    os.system(f'gcc {source} {flag_string} -o {source.stem}')
-    os.system(f'./{source.parent/source.stem} >> {output}')
+    compile_string = f'gcc {source} {flag_string} -o {build_dir/source.stem}'
+    print('+ ' + compile_string)
+    os.system(compile_string)
+    run_string = f'{build_dir/source.stem} >> {output}'
+    print('+ ' + run_string)
+    os.system(run_string)
 
 
 if __name__ == '__main__':
     # Инициализируем директорию сборки
-    if build_dir.exists():
-        sh.move(build_dir, workspace_folder/'backup')
-        os.rmdir(build_dir)
     os.mkdir(build_dir)
 
-    output_file = workspace_folder/'output.csv'
+
+    num_threads = [1, 2, 4, 8]
+    dataset_sizes = ['MINI_DATASET', 'SMALL_DATASET', 'MEDIUM_DATASET', 'LARGE_DATASET']
+    optimizations = [None, 'O2', 'O3', 'fast']
+
+    source = workspace_folder/'for.c'
+
+    for optimization in optimizations:
+        output_file = build_dir/f'output_{optimization}.csv'
+        for dataset in dataset_sizes:
+            os.system(f"echo -n '{dataset},' >> {output_file}")
+            for threads in num_threads:
+                compile_and_run(source, output_file, ['fopenmp', optimization, f'DNUM_THREADS={threads}', f'D{dataset}'])
+                os.system(f"echo -n  ',' >> {output_file}")
+            os.system(f"echo '' >> {output_file}")
 
 
 

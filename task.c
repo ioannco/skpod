@@ -127,8 +127,8 @@ void relax() {
 
         for (i = 1; i <= N - 2; i++)
 #pragma omp task shared(A) firstprivate(i, j, k)
-            for (k = 2; k <= N - 3; k++)
-                for (j = 1; j <= N - 2; j++) {
+			for (j = 1; j <= N - 2; j++)
+				for (k = 2; k <= N - 3; k++){
                     float e;
                     e = A[i][j][k];
                     A[i][j][k] = (A[i][j][k - 1] + A[i][j][k + 1] + A[i][j][k - 2] + A[i][j][k + 2]) * 0.25;
