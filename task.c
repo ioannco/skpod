@@ -59,7 +59,7 @@ void run() {
 
 #pragma omp taskwait
 
-        printf("%f\n", timer);
+        printf("%f", timer);
         verify();
         }
     }
