@@ -10,7 +10,7 @@ if (OPENMP_FOUND)
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
-add_executable(omp_for var75_omp_for.c
-        task.c)
-add_executable(omp_task var75_omp_task.c)
-add_executable(vanilla var75.c)
+
+add_executable(omp_task task.c)
+add_executable(vanilla optimized.c)
+add_executable(omp_for for.c)
