@@ -58,7 +58,6 @@ void relax();
 void init();
 void verify();
 void run();
-double measure_time(void (*func)());
 double getclock();
 
 double getclock()

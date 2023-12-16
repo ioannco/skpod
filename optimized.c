@@ -4,6 +4,7 @@
 #include <time.h>
 #include <omp.h>
 #include <assert.h>
+#include <sys/time.h>
 
 #define  Max(a, b) ((a)>(b)?(a):(b))
 
@@ -50,6 +51,7 @@ void relax();
 void init();
 void verify();
 void run();
+double getclock();
 
 int main(int an, char **as) {
     run();
@@ -121,9 +123,13 @@ void verify() {
 #endif
 }
 
-double measure_time(void(*func)()) {
-    clock_t start = clock();
-    func();
-    clock_t end = clock();
-    return ((double) (end - start)) / CLOCKS_PER_SEC;
+double getclock()
+{
+  struct timeval Tp;
+  int stat;
+  stat = gettimeofday (&Tp, NULL);
+  if (stat != 0) {
+	printf ("Error return from gettimeofday: %d", stat);
+  }
+  return (Tp.tv_sec + Tp.tv_usec * 1.0e-6);
 }
