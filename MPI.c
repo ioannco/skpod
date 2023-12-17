@@ -5,6 +5,7 @@
 #include <omp.h>
 #include <assert.h>
 #include <sys/time.h>
+#include <mpi.h>
 #include "config.h"
 
 #define  Max(a, b) ((a)>(b)?(a):(b))
@@ -25,29 +26,26 @@ void run();
 double getclock();
 
 int main(int an, char **as) {
-    run();
-}
 
-void run() {
-	int it;
+    int it;
 
-	init();
+    init();
 
-	double timer = 0.;
-	int cnt = 0;
+    double timer = 0.;
+    int cnt = 0;
 
-	for (it = 1; it <= itmax; it++) {
-		++cnt;
-		eps = 0.;
-		double bench_t_start = getclock();
-		relax();
-		double bench_t_end = getclock();
-		timer += bench_t_end - bench_t_start;
-		if (eps < maxeps) break;
-	}
-	printf("%f\n", timer);
+    for (it = 1; it <= itmax; it++) {
+        ++cnt;
+        eps = 0.;
+        double bench_t_start = getclock();
+        relax();
+        double bench_t_end = getclock();
+        timer += bench_t_end - bench_t_start;
+        if (eps < maxeps) break;
+    }
+    printf("%f\n", timer);
 
-	verify();
+    verify();
 }
 
 void init() {

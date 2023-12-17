@@ -10,8 +10,16 @@ if (OPENMP_FOUND)
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
+find_package(MPI)
+add_definitions(-DOMPI_SKIP_MPICXX)
 
+add_executable(mpi MPI.c)
 add_executable(omp_task task.c)
 add_executable(vanilla optimized.c)
 add_executable(omp_for for.c
         config.h)
+
+
+target_link_libraries(mpi PRIVATE MPI_C)
+
+
