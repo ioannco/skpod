@@ -22,7 +22,7 @@ if __name__ == '__main__':
     dataset_sizes = ['MINI_DATASET', 'SMALL_DATASET', 'MEDIUM_DATASET', 'LARGE_DATASET', 'EXTRALARGE_DATASET']
     optimizations = ['O2']
 
-    source = workspace_folder/'task.c'
+    source = workspace_folder/'MPI.c'
 
     for optimization in optimizations:
         output_file = build_dir/f'task_data_{optimization}.csv'
