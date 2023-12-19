@@ -90,8 +90,7 @@ void relax() {
         int proc_block_end_idx = Min(N - 2, proc_block_start_idx + step - 1);
         int size = proc_block_end_idx - proc_block_start_idx + 1;
         for (i = 2; i <= N - 3; ++i) {
-            if (size) {
-                printf("%d, %d, %d\n", proc_block_start_idx, size, N);
+            if (size > 0) {
                 MPI_Bcast(&A[i][proc_block_start_idx][0], size * N, MPI_FLOAT, proc, MPI_COMM_WORLD);
             }
         }
@@ -121,8 +120,7 @@ void relax() {
         int proc_block_start_idx = step * proc + 1;
         int proc_block_end_idx = Min(N - 2, proc_block_start_idx + step - 1);
         int size = proc_block_end_idx - proc_block_start_idx + 1;
-        if (size) {
-            printf("%d, %d, %d\n", proc_block_start_idx, size, N);
+        if (size > 0) {
             MPI_Bcast(&A[proc_block_start_idx][0][0], size * N * N, MPI_FLOAT, proc, MPI_COMM_WORLD);
         }
     }
