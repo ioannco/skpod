@@ -25,7 +25,7 @@ if __name__ == '__main__':
     source = workspace_folder/'MPI.c'
 
     for optimization in optimizations:
-        output_file = build_dir/f'task_data_{optimization}.csv'
+        output_file = build_dir/f'MPI_data_{optimization}.csv'
         for dataset in dataset_sizes:
             os.system(f"echo -n '{dataset},' >> {output_file}")
             for threads in num_threads:
