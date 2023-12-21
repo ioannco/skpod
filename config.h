@@ -1,3 +1,4 @@
+#ifndef N
 #if !defined(MINI_DATASET) && !defined(SMALL_DATASET) && !defined(MEDIUM_DATASET) && !defined(LARGE_DATASET) && !defined(EXTRALARGE_DATASET)
 #define MINI_DATASET
 #endif
@@ -34,6 +35,7 @@
 #define  N  (2*2*2*2*2*2*2*2 + 2)
 #ifndef CHECKSUM
 #define CHECKSUM 953108160.000000
+#endif
 #endif
 #endif
 

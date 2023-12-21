@@ -42,6 +42,8 @@ int main(int an, char **as) {
 
 
 void run() {
+    printf("%d\n", NUM_THREADS);
+
     int it;
 
     init();
@@ -58,7 +60,7 @@ void run() {
         timer += bench_t_end - bench_t_start;
         if (eps < maxeps) break;
     }
-    printf("%f", timer);
+    printf("%f\n", timer);
 
     verify();
 }

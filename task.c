@@ -75,6 +75,8 @@ void init() {
             }
 }
 
+
+
 void relax() {
 	const int task_batch_size = N / TASKS_COUNT + 1;
 	for (task_offset = 1; task_offset < N - 1; task_offset += task_batch_size){
