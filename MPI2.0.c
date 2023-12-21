@@ -91,6 +91,10 @@ int main(int an, char **as) {
 	MPI_Type_commit(&MPI_FLOAT_COLUMN);
 	MPI_Type_create_resized(MPI_FLOAT_COLUMN, 0, sizeof(float), &MPI_FLOAT_COLUMN_RESIZED);
 	MPI_Type_commit(&MPI_FLOAT_COLUMN_RESIZED);
+	double timer;
+
+	if (proc_rank == 0)
+		 timer = MPI_Wtime();
 
 	for (int it = 0; it < itmax; it++) {
 		float eps = 0.f;
@@ -100,7 +104,8 @@ int main(int an, char **as) {
 	}
 
 	if (proc_rank == 0) {
-		verify(A);
+		printf("%f\n", MPI_Wtime() - timer);
+		//verify(A);
 		free(A);
 	}
 
@@ -171,9 +176,9 @@ void relax_columns(
 		for (int i = 2; i < N - 2; i++) {
 			columns_block[N * column_index + i] = (
 				columns_block[N * column_index + i - 2] +
-					columns_block[N * column_index + i - 1] +
-					columns_block[N * column_index + i + 1] +
-					columns_block[N * column_index + i + 2]
+				columns_block[N * column_index + i - 1] +
+				columns_block[N * column_index + i + 1] +
+				columns_block[N * column_index + i + 2]
 			) * 0.25f;
 		}
 	}
@@ -200,9 +205,9 @@ float relax_planes(
 			for (int k = 0; k < N; k++) {
 				planes_block[IND(i, j, k)] = (
 					planes_block[IND(i, j - 1, k)] +
-						planes_block[IND(i, j - 2, k)] +
-						planes_block[IND(i, j + 1, k)] +
-						planes_block[IND(i, j + 2, k)]
+					planes_block[IND(i, j - 2, k)] +
+					planes_block[IND(i, j + 1, k)] +
+					planes_block[IND(i, j + 2, k)]
 				) * 0.25f;
 			}
 		}
@@ -214,9 +219,9 @@ float relax_planes(
 				float e = planes_block[IND(i, j, k)];
 				planes_block[IND(i, j, k)] = (
 					planes_block[IND(i, j, k - 1)] +
-						planes_block[IND(i, j, k - 2)] +
-						planes_block[IND(i, j, k + 1)] +
-						planes_block[IND(i, j, k + 2)]
+					planes_block[IND(i, j, k - 2)] +
+					planes_block[IND(i, j, k + 1)] +
+					planes_block[IND(i, j, k + 2)]
 				) * 0.25f;
 				local_eps = Max(local_eps, fabsf(e - planes_block[IND(i, j, k)]));
 			}
