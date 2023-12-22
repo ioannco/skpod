@@ -228,8 +228,6 @@ float relax_planes(
 		}
 	}
 	MPI_Gatherv(planes_block, size, MPI_FLOAT, A, rank_plane_count_map, rank_plane_offset_map, MPI_FLOAT, 0, MPI_COMM_WORLD);
-//	MPI_Reduce(&local_eps, &eps, 1, MPI_FLOAT, MPI_MAX, 0, MPI_COMM_WORLD);
-//	MPI_Bcast(&eps, 1, MPI_FLOAT, 0, MPI_COMM_WORLD);
     MPI_Allreduce(&local_eps, &eps, 1, MPI_FLOAT, MPI_MAX, MPI_COMM_WORLD);
 
 	return eps;
