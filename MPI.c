@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     }
 
     timer = MPI_Wtime() - timer;
-    if (!rank) {
+    if (ROOT_RANK) {
         printf("%f\n", timer);
         //verify();
     }
